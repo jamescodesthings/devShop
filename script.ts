@@ -1,7 +1,7 @@
 // *******************************************************
 // ** Pull requests not actually welcome at this moment **
 // *******************************************************
-// as described in the readme, I may take this commercial, and haven't thought through the implications of accepting PRs on it prior to that. 
+// as described in the readme, I may take this commercial, and haven't thought through the implications of accepting PRs on it prior to that.
 // Ordinarily I'd *love* to welcome PR's but for now, no PR's please.
 
 //Definitely
@@ -29,8 +29,8 @@
 // [ ] 🐛Words wrap in store
 // [ ] 🐛Icons and help icon are not vertically centered in store (other content is not either)
 // [ ] Training should have a time cost (? increases at higher levels of training)
-// [ ] Multi-skilled person choosing task to do could be based on: 
-//        total number of points in a column divided by number of people with that skill. 
+// [ ] Multi-skilled person choosing task to do could be based on:
+//        total number of points in a column divided by number of people with that skill.
 //        Worst ratio? Do that next. In case of tie-break, go with right most column.
 //        No -- if any are worse than the threshold -- do the worst.
 //        if all are better than the threshold, choose from the right.
@@ -54,45 +54,28 @@
 // -> game itself needs a way to exit then.
 // fire people?
 // limited people?
-// 
+//
 
 
 let testMode = false;//true;
 let storeFeatureFlag = true;//testMode;
 let timeBarFeatureFlag = false;
 let timePenaltyFeatureFlag = false;
-let debugOutput = false; 
+let debugOutput = false;
 let game: Game;
-
-// basic test modes
-testMode = (testMode || getParameterByName('testmode') == "true");
-
-let avgDuration = testMode ? 4 : 600;  // factor that all work durations are based on, in milliseconds
-let startingMoney = testMode ? 100 : 100;
-let defaultCompletionTime = testMode? 10 : 100; //how long have you got to complete a project, in seconds?
-
-
-debugOutput = (debugOutput || testMode || getParameterByName('debug') == "true");
-
-// basic feature flags  
-timeBarFeatureFlag = (timeBarFeatureFlag || getParameterByName('timebarflag') == "true"); //?timebarflag=true
-storeFeatureFlag = (storeFeatureFlag || getParameterByName('storeflag') == "true"); //?storeflag=true
-
-if (debugOutput) {
-  $id('debug').classList.remove('hidden');
-  log('debug mode detected');
-}
-
+let avgDuration: number;
+let startingMoney: number;
+let defaultCompletionTime: number;
 
 enum ItemCode {
   cat = 1,
   dog,
-  upskillTest, 
-  upskillDev, 
+  upskillTest,
+  upskillDev,
   upskillBA,
   selfstart,
-  seat, 
-  coffee, 
+  seat,
+  coffee,
   coffeemachine,
   donutmachine,
   cupcake,
@@ -122,10 +105,10 @@ function getAllLevelItems(): { [id: string]: StoreItem[]; } {
   // Note that skillneeded includes the special value "any" which means it can be applied to any person.
   // TODO: ?? There could be a 'must not have skill' property... e.g. Beginning Development (only for non-developers)
   //The 'code' property is used in `function useIt` to decide how the card affects the player.
-  let allItems: { [id: string]: StoreItem[]; } = 
+  let allItems: { [id: string]: StoreItem[]; } =
       { "l2": //Level 2 Items
        [{id:5,name:'Tasty donut', price:5, icon:"🍩", skillneeded:"any", busy:false, code:ItemCode.donut, activeDuration:30, description: 'A sugary fix will speed you up... but not for long.', enabled:false},
-       {id:10,name:'Cup of coffee', price:10, icon:"☕", skillneeded:"any", busy:false, code:ItemCode.coffee, activeDuration:60, description: 'A cup of joe will speed up any worker …if only for a little while.', enabled:false},      
+       {id:10,name:'Cup of coffee', price:10, icon:"☕", skillneeded:"any", busy:false, code:ItemCode.coffee, activeDuration:60, description: 'A cup of joe will speed up any worker …if only for a little while.', enabled:false},
        //{id:14,name:'Initiative Training', price:5, icon:"🚀", skillneeded:"any", busy:false, code:ItemCode.selfstart, activeDuration:0, description: 'When you\'re idle, go and check the board to see if there is anything you can do. Purchase multiple times to show initiative sooner!', enabled:false},
        ],
         "l3": //Level 3 Items
@@ -148,12 +131,12 @@ function getAllLevelItems(): { [id: string]: StoreItem[]; } {
        [
         {id:150,name:'Seat upgrade', price:400, icon:"💺", skillneeded:"any", busy:false, code:ItemCode.seat, activeDuration:0, description: 'A comfortable seat upgrade makes any worker more efficient.', enabled:false},
         {id:155,name:'Headphone upgrade', price:700, icon:"🎧", skillneeded:"any", busy:false, code:ItemCode.headphones, activeDuration:0, description: 'With better headphones a person\'s focus is greatly improved!', enabled:false},
- 
+
        ],
        "l7":
        [
         {id:160,name:'Office dog', price:6000, icon:"🐶", skillneeded:"any", busy:false, code:ItemCode.dog, activeDuration:200, description:'Bring joy and efficiency to the workplace. Care for a dog and double your speed', enabled:false},
- 
+
        ],
        "l8":
        [
@@ -231,17 +214,17 @@ function getAllLevelItems(): { [id: string]: StoreItem[]; } {
 }
 
 /*
- defer: some things like a packet of cookies or a packet of donuts -- have a qty... 
+ defer: some things like a packet of cookies or a packet of donuts -- have a qty...
 
 
   🍔🥗🍪
-  
+
 
     - Desk bling 💎
     - Stuffed flatbread 🥙
-    - Desk ornament 
+    - Desk ornament
 		- Personal Robot 🤖
-	
+
 		- Fax machine 📠
 		- Printer 🖨
 
@@ -256,7 +239,7 @@ interface PersonType {
 }
 
 function getAllPeopleTypes() : { [id:string]: PersonType; } {
-  return { 
+  return {
       "dev":  { skill: "dev", price: 120, icon:"💻", title: "dev"},
       "test": {skill: "test", price: 150, icon:"🔬", title: "tester"},
       "ba":   {skill: "ba", price:250, icon:"🗣", title: "business analyst"}
@@ -267,7 +250,7 @@ function getAllPeopleTypes() : { [id:string]: PersonType; } {
 // *******************************************************
 // ** Pull requests not actually welcome at this moment **
 // *******************************************************
-// as described in the readme (and above), I may take this commercial, and haven't thought through the implications of accepting PRs on it prior to that. 
+// as described in the readme (and above), I may take this commercial, and haven't thought through the implications of accepting PRs on it prior to that.
 // Ordinarily I'd *love* to welcome PR's but for now, no PR's please.
 
 
@@ -276,10 +259,10 @@ class Game {
   constructor(startingMoney: number) {
     this.Money = startingMoney;
     this.HighestMoney = startingMoney;
-    this.Inflation = testMode? 1.3 : 1.3; // 30 %
-    this.SmallInflation = testMode? 1.05 : 1.05; // 5 %
-    this.MediumInflation = testMode? 1.10 : 1.10; // 10 %
-    this.HyperInflation = testMode? 3 : 3; //300%
+    this.Inflation = testMode ? 1.3 : 1.3; // 30 %
+    this.SmallInflation = testMode ? 1.05 : 1.05; // 5 %
+    this.MediumInflation = testMode ? 1.10 : 1.10; // 10 %
+    this.HyperInflation = testMode ? 3 : 3; //300%
     this.Level = 1;
     this.XP = 0;
     this.TotalXP = 0;
@@ -293,19 +276,19 @@ class Game {
     this.Projects = {};
     this.AllLevelItems = getAllLevelItems();
     this.StoreItems = {};
-    for(let k in this.AllLevelItems){
-      for(let x in this.AllLevelItems[k]){
+    for (let k in this.AllLevelItems) {
+      for (let x in this.AllLevelItems[k]) {
         this.StoreItems[this.AllLevelItems[k][x].id] = this.AllLevelItems[k][x];
       }
     }
-    
+
     //this.StoreItems =  getAllLevelitems().each()
 
     this.AllPeopleTypes = getAllPeopleTypes();
     this.Items = {};
     this.SelectedDoer = null;
     this.SelectedReceiver = null;
-    this.DefaultSelfStartDelay = testMode? 18000 : 18000; //12 second pause between self-starters polling the board.
+    this.DefaultSelfStartDelay = testMode ? 18000 : 18000; //12 second pause between self-starters polling the board.
     this.AnimalTendingDelay = 3900;
     this.MaxAge = defaultCompletionTime; // give them this many seconds to complete *every* project; (increases slightly each level)
     this.StartTime = new Date();
@@ -316,6 +299,7 @@ class Game {
     this.PositiveCashFlows = [];
     this.PositivePointEvents = [];
   }
+
   Money: number;
   LifeTimeRevenue: number;
   LifeTimeRevenueMinus1Minute: number;
@@ -327,7 +311,7 @@ class Game {
   Inflation: number;
   SmallInflation: number;
   MediumInflation: number;
-  HyperInflation: number; 
+  HyperInflation: number;
   Level: number;
   XP: number;
   LevelUpXP: number;
@@ -336,19 +320,77 @@ class Game {
   LeadPrice: number;
   TotalXP: number;
   NextId: number; // TODO: private. used for determining primary key of staff members (inside the 'nextId' function)
-  People: { [id: string] : Person; }; //id's start with "p"
-  Projects: { [id: string] : Project; } // id's start with "r"
-  Stories: { [id: string] : Story; };// id's start with "r"
+  People: { [id: string]: Person; }; //id's start with "p"
+  Projects: { [id: string]: Project; } // id's start with "r"
+  Stories: { [id: string]: Story; };// id's start with "r"
   AllLevelItems: { [id: string]: StoreItem[]; } // all possible store items, grouped by the level where they become available
-  AllPeopleTypes: { [id:string]: PersonType; } // the skills
-  StoreItems: { [id:string]: StoreItem;} // the items that are currently available in the store.
+  AllPeopleTypes: { [id: string]: PersonType; } // the skills
+  StoreItems: { [id: string]: StoreItem; } // the items that are currently available in the store.
   Items: { [id: string]: StoreItem; } //all items that have been purchased and added to the game, start with "i"
   SelectedDoer: string; //id of selected person
   SelectedReceiver: string; //id of selected story
   DefaultSelfStartDelay: number;
   AnimalTendingDelay: number; // how long does it take to settle an animal down at your desk. (Can this involve the following emoji? 💩)
-  MaxAge:number;
-  StartTime:Date;
+  MaxAge: number;
+  StartTime: Date;
+
+  static init() {
+    log('Initialising variables');
+
+    // basic test modes
+    testMode = (testMode || getParameterByName('testmode') == "true");
+
+
+    avgDuration = testMode ? 4 : 600;  // factor that all work durations are based on, in milliseconds
+    startingMoney = testMode ? 100 : 100;
+    defaultCompletionTime = testMode ? 10 : 100; //how long have you got to complete a project, in seconds?
+
+    debugOutput = (debugOutput || testMode || getParameterByName('debug') == "true");
+
+    // basic feature flags
+    timeBarFeatureFlag = (timeBarFeatureFlag || getParameterByName('timebarflag') == "true"); //?timebarflag=true
+    storeFeatureFlag = (storeFeatureFlag || getParameterByName('storeflag') == "true"); //?storeflag=true
+
+    if (debugOutput) {
+      $id('debug').classList.remove('hidden');
+      log('debug mode detected');
+    } else {
+      $id('debug').classList.add('hidden');
+    }
+
+    Game.updateAbout();
+  }
+
+  static reload() {
+    window.location.reload();
+  }
+
+  static toggleDebug() {
+    Game.toggle('debug');
+  }
+
+  static toggleTest() {
+    Game.toggle('testmode');
+  }
+
+  static toggle(param) {
+    log('toggling ${param}');
+    // Force a reload
+    $('exitAbout').classList.add('hidden');
+    const current = getParameterByName(param) === 'true';
+
+    setParameterByName(param, current ? 'false' : 'true');
+
+    log(`setting ${param} to ${!current}`);
+    Game.init();
+  }
+
+  static updateAbout() {
+    $id('toggleDebug')
+      .innerHTML = `🐞 Toggle Debug: ${getParameterByName('debug')}`;
+    $id('toggleTest')
+      .innerHTML = `📝 Toggle Test: ${getParameterByName('testmode')}`;
+  }
 }
 
 interface Payment {
@@ -400,7 +442,7 @@ interface Story {
   hasBug: boolean;
   hasSpecBug: boolean;
   customerFoundBug: boolean;
-  reworkLevel: number;  // when a card is being reworked due to a found bug or spec bug, it is rework. (And is less time than the original work). 
+  reworkLevel: number;  // when a card is being reworked due to a found bug or spec bug, it is rework. (And is less time than the original work).
   projectId: string; //contains 'r'
   pointPrice: number;
   startingTime: Date;
@@ -414,7 +456,7 @@ interface StoreItem {
   icon: string;
   skillneeded: string;
   busy: boolean;
-  code: ItemCode; //'code' is a short, readable, ID, such as 'dog' used in switch statement somewhere for all the deep logic/capabilities of StoreItems... as they can ultimately do anything. 
+  code: ItemCode; //'code' is a short, readable, ID, such as 'dog' used in switch statement somewhere for all the deep logic/capabilities of StoreItems... as they can ultimately do anything.
   description: string;
   activeDuration: number; //how long does the item act on the person? (0 for indefinitely)
   enabled:boolean;
@@ -432,27 +474,27 @@ class Project {
 function initGameState():void
 {
   game = new Game(startingMoney);
-  let allSkills = 
+  let allSkills =
     {
       "dev": { level: 1},
       "test": {level: 1},
       "ba": {level: 1}
     };
-  
-  let player: Person = { 
-      id: nextId(), 
-      skills: allSkills, 
-      name: "Founder", 
-      summary: "💤", 
-      icon:"🤔", 
-      XP: 0, 
-      busy: false, 
-      selfStarterLevel: 0, 
-      has: {}, 
-      seatLevel: 0, 
-      keyboardLevel:0, 
-      headphoneLevel:0, 
-      selfStartDelay: game.DefaultSelfStartDelay, 
+
+  let player: Person = {
+      id: nextId(),
+      skills: allSkills,
+      name: "Founder",
+      summary: "💤",
+      icon:"🤔",
+      XP: 0,
+      busy: false,
+      selfStarterLevel: 0,
+      has: {},
+      seatLevel: 0,
+      keyboardLevel:0,
+      headphoneLevel:0,
+      selfStartDelay: game.DefaultSelfStartDelay,
       triggerTime:null};
   game.People['p' + player.id] = player;
   incrementXP(0);
@@ -479,9 +521,9 @@ function drawButtons():void {
     let d = $id(`get${value.skill}`);
     if (d != undefined) {
       d.innerHTML = `<span class='icon'>${value.icon}</span> hire ${value.title} (💲${value.price})`;
-      d.setAttribute('onclick', `getNewPerson("${value.skill}");`);    
+      d.setAttribute('onclick', `getNewPerson("${value.skill}");`);
     }
-  }  
+  }
 }
 
 function drawMoney(money: number):void {
@@ -531,8 +573,8 @@ function drawTimebar(target: HTMLSpanElement, key: string, story: Story):void { 
         percent = 100; //full-height red bad. TODO: fix color blindness issue though.
         //might be good to change some other aspect to highlight it is overdue.
     }
-      
-    
+
+
 
     target.style.height = "" + percent + "%";
     target.style.minHeight = "" + percent + "%";
@@ -624,8 +666,8 @@ function updateColumnCount(column:string):void {
   if (target && target.length == 1) {
     const count = $('#' + column + ' .inner .story').length;
     target[0].innerText = '' + count;
-    target[0].setAttribute('data-count', '' + count); 
-    // consider: check the number of people who have this skill. 
+    target[0].setAttribute('data-count', '' + count);
+    // consider: check the number of people who have this skill.
     //If the count > (#people) make the color yellowish;
     //if the count > (#people * 2 + 2) make the color redish;
   }
@@ -638,7 +680,7 @@ function drawStories(stories: {[id: string] : Story}):void {
 
 function drawTimebars(stories: {[id: string] : Story}):void {
   const el = document.getElementById('kanbanboard');
-  
+
   for(const key in stories) {
     let target = el.querySelector('#' + key + " .time-bars .elapsed") as HTMLSpanElement;
     drawTimebar(target, key, stories[key]);;
@@ -683,7 +725,7 @@ function drawPerson(key: string, people: { [x: string]: Person; }):void {
   for (let key of Object.keys(person.skills)) {
     newPersonElement.classList.add(key);
   }
-  
+
   if (newPerson) {
     el.appendChild(newPersonElement);
   } else {
@@ -694,7 +736,7 @@ function drawPerson(key: string, people: { [x: string]: Person; }):void {
 function getItemsHtml(person:Person):string{
   //was: return = Object.keys(items).map(k => items[k].icon).join(" ");
   let result = '';
-  
+
   for(const itemKey of Object.keys(person.has)) {
     let item = person.has[itemKey];
     let levelAttribute = '';
@@ -738,18 +780,20 @@ function go():void {
 
   initGameState();
   drawRoom();
-  $id('start').classList.remove("pulse");   //hide 'start' button's pulse effect. 
+  $id('start').classList.remove("pulse");   //hide 'start' button's pulse effect.
   $id('start').classList.add("hidden");   //hide 'start' button
-  
+
   //removeClass('#office', 'hidden');
   $id('startscreen').classList.add('hidden');
+  $id('aboutLink').classList.add('hidden');
+  $id('helpLink').classList.add('hidden');
   $id('office').classList.remove('hidden');
   removeClass('#getLead', 'hidden'); //show 'purchase sales lead' button
   removeClass('.metrics','hidden'); // show heads up display.
   if (!timeBarFeatureFlag) $id('rate').classList.add('hidden');
-  
+
   addClass(".getPerson", 'hidden'); //hide 'buy dev/test/ba' buttons. (They are re-enabled when total >= 300)
-  
+
 
 
   drawMessage("STEP 1: press '🎁 find project'");
@@ -757,11 +801,11 @@ function go():void {
 }
 
 function getNewLead():void {
-  
+
   DeSelectDoerAndReceiver();
 
   let price = game.LeadPrice;
-  
+
   if (game.Money < 0) {
     drawMessage("Will need to go FURTHER into debt to get this lead.");
   } else if (game.Money < price) {
@@ -772,11 +816,11 @@ function getNewLead():void {
   incrementXP(5);
   // TODO: instead of 10 points and value 1000....
   // should be based on current level... some randomness.
-  let newLead:Story = { 
-      id: nextId(), 
-      points:game.ProjectSize, 
-      pointPrice:game.PointPrice, 
-      status:"lead", 
+  let newLead:Story = {
+      id: nextId(),
+      points:game.ProjectSize,
+      pointPrice:game.PointPrice,
+      status:"lead",
       skillneeded:"ba",
       summary:projectName(),
       logo: getLogo(),
@@ -825,7 +869,7 @@ function getNewPerson(skill: string):void {
     drawMessage(`Cannot afford a new ${personType.title}.`);
     return;
   }
-  
+
   removeClass('.getPerson.' + skill, 'hint');
 
   incrementMoney(personType.price * -1);
@@ -833,14 +877,14 @@ function getNewPerson(skill: string):void {
   let id = nextId();
   let skillo = {};
   skillo[skill] = { level: 1};
-  let newEmployee: Person = 
-    { id: id, 
-      skills: skillo, 
-      summary: "💤", 
-      icon: getIcon(), 
-      name: getName(), 
-      XP: 0, 
-      busy: false, 
+  let newEmployee: Person =
+    { id: id,
+      skills: skillo,
+      summary: "💤",
+      icon: getIcon(),
+      name: getName(),
+      XP: 0,
+      busy: false,
       selfStarterLevel: 0,
       has: {},
       seatLevel: 0,
@@ -884,7 +928,7 @@ document.onkeypress = function(e):void {
 function isPossible(story:Story):boolean {
   if (game.SelectedDoer != undefined && game.SelectedDoer != null) {
     if (story.skillneeded == "any") return true;
-    console.log("skillneeded", story.skillneeded);
+    console.log(`skillneeded ${story.skillneeded}`);
     let skills = game.People[game.SelectedDoer].skills;
     console.log(skills);
     if (Object.keys(skills).includes(story.skillneeded)) {
@@ -924,7 +968,7 @@ function deselectDoer():void {
   let doer = $id(game.SelectedDoer);
 
   game.SelectedDoer = null;
-  
+
   if (doer == undefined) return;
 
   doer.classList.remove('selected');
@@ -938,7 +982,7 @@ function selectDoer():void {
 }
 
 function clickDoer(id: string) {
-  
+
   // can't select (or deselect) a busy person.
   if (game.People[id].busy) {
     log("can't select (or deselect) a busy item. (" + game.People[id].name + " " + game.People[id].icon + ")");
@@ -970,7 +1014,7 @@ function deselectReceiver():void {
   game.SelectedReceiver = null;
 
   if (receiver == undefined) return;
-  
+
   receiver.classList.remove('selected');
 
   removeAllClass("possible");
@@ -1001,7 +1045,7 @@ function clickReceiver(id: string) {
 
   game.SelectedReceiver = id;
   selectReceiver();
-  
+
   if (game.SelectedReceiver != undefined && game.SelectedDoer != undefined) {
     tryDo(game.SelectedDoer, game.SelectedReceiver, false);
   }
@@ -1010,7 +1054,7 @@ function clickReceiver(id: string) {
 function tryDo(doId: string, receiverId: string, viaDoer: boolean) {
   let doer = game.People[doId];
   let receiver = game.Stories[receiverId] || game.Items[receiverId];
-  
+
   if (receiver.skillneeded != "any" && !Object.keys(doer.skills).includes(receiver.skillneeded)) {
     if (viaDoer) {
       deselectReceiver();
@@ -1058,18 +1102,18 @@ function applyItem(person:Person, item:StoreItem) {
       } else {
         drawMessage(`${person.name} ${person.icon} will display ⭐more⭐ initiative (level ${person.selfStarterLevel}).`);
       }
-      
+
       if (person.busy == false) {
         personFree(person);
       }
       break;
-    case ItemCode.seat:  
+    case ItemCode.seat:
       person.seatLevel++;
       if (person.seatLevel == 1) {
         person.has['i'+item.id] = item;
       }
       break;
-    case ItemCode.headphones:  
+    case ItemCode.headphones:
       person.headphoneLevel++;
       if (person.headphoneLevel == 1) {
         person.has['i'+item.id] = item;
@@ -1094,7 +1138,7 @@ function applyItem(person:Person, item:StoreItem) {
       } else {
         person.skills["dev"] = { level: 1};
       }
-      break; 
+      break;
     case ItemCode.upskillBA:
         if (person.skills["ba"] != undefined) {
           person.skills["ba"].level++;
@@ -1112,9 +1156,9 @@ function applyItem(person:Person, item:StoreItem) {
       let animal = item.code == ItemCode.dog? "dog" : "cat";
       person.summary = `Tending to ${item.name} ${item.icon} (the ${animal})` ;
       drawMessage(`${person.name} ${person.icon} has the ${animal} ${item.name} ${item.icon}`);
-      setTimeout(function() { usingFinishedBusyPhase(person, item);}, game.AnimalTendingDelay); 
+      setTimeout(function() { usingFinishedBusyPhase(person, item);}, game.AnimalTendingDelay);
       setTimeout(function() { usingFinished(person, item);}, item.activeDuration*500);
-      
+
       // length of time cat/dog spends with someone increase each time they visit. (Controversial?)
       item.activeDuration *= 1.25;
       person.has['i'+item.id] = item;
@@ -1140,12 +1184,12 @@ function applyItem(person:Person, item:StoreItem) {
       }
       break;
     default:
-      log("Unhandled item type! " + item.icon + " " + item.code + " " + item.name);    
+      log("Unhandled item type! " + item.icon + " " + item.code + " " + item.name);
   }
 }
 
-// Some items (like the dog and the cat) have a short initially 'busy' phase after you grab them. 
-// Once that finishes, 
+// Some items (like the dog and the cat) have a short initially 'busy' phase after you grab them.
+// Once that finishes,
 function usingFinishedBusyPhase(person:Person, item:StoreItem) {
   person.busy = false;
   person.summary = "💤";
@@ -1212,8 +1256,8 @@ function selfStart(person:Person, triggerTime:Date){
   log(person.name + " " + person.icon + " is busy? " + person.busy);
   if (!person.busy) {
     log(`${person.name} ${person.icon} is checking the board now....`);
-    //TODO: implement this. And log above instead of 'drawmessage'  
-    
+    //TODO: implement this. And log above instead of 'drawmessage'
+
     let columns:string[] = [];
 
     // we prioritise self-starting from the back of the board.
@@ -1241,7 +1285,7 @@ function selfStart(person:Person, triggerTime:Date){
         break;
       }
     }
-    
+
   }
 
   // If they did not find anything to do in the above scanning of the board, then person.busy will be false and we will
@@ -1256,7 +1300,7 @@ function usingFinished(person:Person, item:StoreItem) {
   //jalert(person.has);
   delete person.has['i'+item.id];
   //jalert(person.has);
-  
+
   // the office cat and the office dog return to the in-tray when you are finished with them.
   switch(item.code){
     case ItemCode.dog:
@@ -1264,7 +1308,7 @@ function usingFinished(person:Person, item:StoreItem) {
         drawInboxItem('i' + item.id, item);
         drawMessage(item.name + ' ' + item.icon + ' has left ' + person.name + ' ' + person.icon + ' and is back to the inbox');
         break;
-  } 
+  }
 
   drawPerson('p' + person.id, game.People);
 }
@@ -1281,7 +1325,7 @@ function doIt(doId: string, receiverId: string) {
     useIt(doId, item);
     return;
   }
-  
+
   let person = game.People[doId];
   story.busy = true;
   story.icon = person.icon;
@@ -1292,7 +1336,7 @@ function doIt(doId: string, receiverId: string) {
   drawPerson(doId, game.People);
   drawStory(receiverId, game.Stories, story.reworkLevel > 0);
   let duration = getDuration(person, story);
-  
+
   log("Duration: of " + story.summary + " " + story.skillneeded + ": " + Math.floor(duration));
   setTimeout(function() { done(receiverId);}, duration);
 }
@@ -1329,7 +1373,7 @@ function getEfficiency(person:Person, skill:string):number {
   if (personHas(person, ItemCode.cookie)) level++;
   //coffee givestwice the power!!
   if (personHas(person, ItemCode.coffee) || personHas(person, ItemCode.coffeemachine)) level = level + 2;
-  
+
   switch (level) {
     case 0: return 0;
     case 1 : return 0.3;
@@ -1358,7 +1402,7 @@ function getDuration(person:Person, story:Story):number {
   if (story.reworkLevel > 0 && (story.skillneeded == "ba" || story.skillneeded == "dev")) {
     duration = duration / (story.reworkLevel + 1);// Math.pow(2, story.reworkLevel);
   }
-  
+
   if (personHas(person, ItemCode.dog)) {
     // A person in possession of a dog works twice as fast. No-one understands why.
     log("Faster work when you have that 🐶, " + person.name + "!")
@@ -1381,8 +1425,8 @@ function getSummary(story: Story) {
 function getTaskVerb(skill: string) {
   switch(skill) {
     case "ba": return "analyzing"; //scribing, breaking-down, encarding
-    case "dev": return "designing"; //envisioning, grasping, comprehending, studying, 
-    case "dev0": return "developing"; //"hacking", "coding", "developing", 
+    case "dev": return "designing"; //envisioning, grasping, comprehending, studying,
+    case "dev0": return "developing"; //"hacking", "coding", "developing",
     case "test": return "testing"; //inspecting
   }
 }
@@ -1449,7 +1493,7 @@ function doneBa(storyId: string) {
 
     oldStory.hasSpecBug = false; //if it was a spec bug, it is now fixed.
     oldStory.hasBug = false; //If it was a regular bug, the further development will resolve it.
-    oldStory.icon = null; //remove the icon... 
+    oldStory.icon = null; //remove the icon...
     log("Fixed the bug (or spec bug)");
     removeStory(storyId); //remove the story from the Inbox...
     drawStory(storyId, game.Stories, true); //top of the backlog... race it through
@@ -1457,7 +1501,7 @@ function doneBa(storyId: string) {
     person.busy = false;
     person.summary = "💤";
     drawPerson('p' + person.id, game.People);
-  
+
     return;
   }
 
@@ -1465,11 +1509,11 @@ function doneBa(storyId: string) {
   game.Projects[storyId] = new Project(oldStory);
 
   let newCards = ElaborateProject(oldStory, person);
-  
+
   person.busy = false;
   person.summary = "💤";
   drawPerson('p' + person.id, game.People);
-  
+
   // The original lead is removed from the board.
   removeStory(storyId);
   // The new stories are added (to the bottom of the 'backlog' column)
@@ -1478,8 +1522,8 @@ function doneBa(storyId: string) {
   }
 }
 
-function determineIfAddingSkillBug(person: Person, story: Story, skill:string):boolean { 
-  
+function determineIfAddingSkillBug(person: Person, story: Story, skill:string):boolean {
+
   let skillPointBugLikelihood = 100.0 * getBuginess(person, skill);
   if (story.reworkLevel > 0) {
     // an item being reworked is quicker to work on (handled elsewhere), and has MUCH less chance of new bugs being introduced.
@@ -1507,19 +1551,19 @@ function determineIfAddingSkillBug(person: Person, story: Story, skill:string):b
 function ElaborateProject(project: Story, person: Person): Story[] {
   let numCards = Math.floor(project.points / 3) + 1;
   log("Lead: " + project.summary + " " + project.logo + " has been analyzed. " + numCards + " stories are being created.");
-  
+
   let remainingPointsToAllocate = project.points;
   let newCards = [];
-  
+
   // Deal out starting cards worth 1 point each.
   for(let i = 0; i<numCards; i++) {
     let summary = getTask();
-    let newCard:Story = { 
-        id: nextId(), 
-        pointPrice:project.pointPrice, 
+    let newCard:Story = {
+        id: nextId(),
+        pointPrice:project.pointPrice,
         points: 1, // points are corrected in next section.
-        status:"story", 
-        skillneeded:"dev", 
+        status:"story",
+        skillneeded:"dev",
         summary: summary,
         logo:project.logo,
         projectId: 'r' + project.id,
@@ -1570,18 +1614,18 @@ function doneDev(storyId: string) {
   //either add it to dev -- or send it back to be clarified (if you find a spec bug)
   let person = game.People[game.Stories[storyId].person];
   let story = game.Stories[storyId];
-  
+
   // no spec bugs can be found until level 3.
   if (game.Level > 2 && story.hasSpecBug) {
     let percentChanceOfFindingSpecBug:number = 100.0 * canFindBug(person, "dev");
     log("Story " + story.summary + " has a spec bug 💥, there is a " + Math.floor(percentChanceOfFindingSpecBug) + "% chance of the developer finding it.");
     let foundSpecBug = (Math.floor(Math.random() * 100) < percentChanceOfFindingSpecBug);
     if (foundSpecBug) {
-    
+
       person.busy = false;
       person.summary = "💤";
       drawPerson('p' + person.id, game.People);
-	
+
       drawMessage(person.name + " discovered a spec bug 💥 in story '" + story.summary + "'");
       story.person = null;
       story.hasBug = null;
@@ -1604,7 +1648,7 @@ function doneDev0(storyId: string) {
   //Add it to test
   let story = game.Stories[storyId];
   let person = game.People[story.person];
-  
+
   //chance of adding a bug relates to effectiveness of ba, and size of story. (and whether or not they have... a cat)
   if (determineIfAddingSkillBug(person, story, "dev")) {
     story.hasBug = true;
@@ -1695,7 +1739,7 @@ function bankStory(storyId: string) {
 
   // If story has a bug... customer will definitely find it! (it got past testing!)
   //and it will go all the way back to the ba column, even if it wasn't a spec bug!
-  
+
   // no bugs can be found until level 2, no spec bugs until level 3
   if ((game.Level > 1 && story.hasBug) || (game.Level > 2 && story.hasSpecBug)) {
     //remove from board
@@ -1715,7 +1759,7 @@ function bankStory(storyId: string) {
   let price = Math.floor(story.points * story.pointPrice);
   let message2 = ` for '${story.summary}'`;
   incrementXP(5);
-  
+
   if (story.customerFoundBug) {
     //(it was halved when it was first found)
     message2 += " (reduced as customer found that bug)";
@@ -1733,7 +1777,7 @@ function bankStory(storyId: string) {
     if (project.stories.length == 0) {
 
       bonus = Math.ceil(project.lead.points * project.lead.pointPrice / 2);
-        
+
       if (!timeBarFeatureFlag) {
         message2 += ` plus 💲${bonus} for completing ${project.lead.summary} ${project.lead.logo}`;
         incrementXP(10);
@@ -1750,7 +1794,7 @@ function bankStory(storyId: string) {
 
         } else if (timePenaltyFeatureFlag && tenths >= 10) {
           bonus = Math.ceil(bonus * -0.5);
-          message2 += `...MINUS penalty 😭 of 💲${Math.abs(bonus)}❗ for late completion of ${project.lead.summary} ${project.lead.logo}❕`;  
+          message2 += `...MINUS penalty 😭 of 💲${Math.abs(bonus)}❗ for late completion of ${project.lead.summary} ${project.lead.logo}❕`;
           incrementXP(2);
 
         } else {
@@ -1816,6 +1860,13 @@ function removeAllClass(className: string) {
 }
 
 function getParameterByName(name: string) {
+  if (window.usingCordova) {
+    const val = localStorage.getItem(name);
+
+    // if (val) log(`got ${name}: ${val}`);
+    return val;
+  }
+
   let url = window.location.href;
   name = name.replace(/[\[\]]/g, '\\$&');
   let regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
@@ -1823,6 +1874,16 @@ function getParameterByName(name: string) {
   if (!results) return null;
   if (!results[2]) return '';
   return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+
+function setParameterByName(name: string, value: string) {
+  log(`setting ${name}: ${value}`);
+  if (window.usingCordova) {
+    localStorage.setItem(name, value);
+    log(`set in local storage ${name}: ${value}`);
+  } else {
+    log('Can\'t set yet...todo');
+  }
 }
 
 function drawMessage(message: string) {
@@ -1880,13 +1941,13 @@ function getTask() {
 function LevelUp() {
   game.XP -= game.LevelUpXP;
   game.Level += 1;
-  
+
   drawMessage(`Level Up! ${game.Level}🥑`);
   game.LevelUpXP = Inflate(game.Inflation, game.LevelUpXP);
   game.PointPrice = Inflate(game.Inflation, game.PointPrice);
   game.ProjectSize = Inflate(game.SmallInflation, game.ProjectSize);
   game.MaxAge += 5; //an extra 5 seconds is allowed for completing projects on each level;
-  
+
   let items = game.AllLevelItems["l" + game.Level];
   if (items != undefined) {
     for(const item of items) {
@@ -1905,7 +1966,7 @@ function LevelUp() {
   switch(game.Level) {
     case 2:
     //show 'hire dev/tester/ba' buttons
-      removeClass('.getPerson.dev', 'hidden'); 
+      removeClass('.getPerson.dev', 'hidden');
       addClass(".getPerson.dev", 'hint');
       if (storeFeatureFlag) {
         removeClass('.visitStore', 'hidden');
@@ -1913,11 +1974,11 @@ function LevelUp() {
       }
       break;
     case 3:
-      removeClass('.getPerson.test', 'hidden'); 
+      removeClass('.getPerson.test', 'hidden');
       addClass('.getPerson.test', 'hint');
       break;
     case 4:
-      removeClass('.getPerson.ba', 'hidden'); 
+      removeClass('.getPerson.ba', 'hidden');
       addClass('.getPerson.ba', 'hint');
       break;
   }
@@ -2000,7 +2061,7 @@ function drawStore() {
   let itemList = $id('items');
   // clear store items from #items
   itemList.innerText = "";
-  // add store items to #items  
+  // add store items to #items
   for (let key of Object.keys(game.StoreItems)) {
     let item = game.StoreItems[key];
     let shtml = `<div class='storeItem-catalog ${item.enabled? 'item-enabled' : 'item-disabled'}'><div onclick='purchase(${item.id});' class='button' id='store-button-${item.id}'>💲${item.price}</div><span class='storeIcon'>${item.icon}</span> <span class='item-name'>${item.name}</span><span class='describe' onclick='describe(${item.id});' title='more information'>❓</span></div>`;
@@ -2021,7 +2082,7 @@ function leaveStore() {
 
 function purchase(itemId:number):void {
   let item:StoreItem = game.StoreItems[itemId];//.filter(i => i.id == itemId)[0];
-  
+
   if (!item.enabled) {
     drawStoreMessage(`The ${item.name} ${item.icon} is not yet available`);
     return;
@@ -2047,11 +2108,11 @@ function purchase(itemId:number):void {
   }
 
   game.Items["i" + clone.id] = clone;
-  
+
   drawStoreMessage(`You bought ${clone.name} ${clone.icon} for 💲${clone.price}. Nice!`);
-  
+
   // Every time you purchase an item, the price of that item goes up
-  // consider: some specific items should have a different inflation curve. 
+  // consider: some specific items should have a different inflation curve.
   item.price = Inflate(game.MediumInflation, item.price);
 
   drawInboxItem("i" + clone.id, clone);
@@ -2088,22 +2149,22 @@ function mainLoop() {
     drawTimebars(game.Stories);
     trackIncome();
   }
-  
+
 }
 
 function trackIncome() {
   let now = new Date();
   //how long has the game been going?
   let gameAge_s:number = Math.floor(Math.abs(game.StartTime.getTime() - now.getTime())/1000);
-  
+
   if (gameAge_s > 60) {
     let OneMinuteAgo:Date = new Date(now.getTime() - 60000);
     let toRemove:Payment[] = [];
-    //remove any incomes from start of 
+    //remove any incomes from start of
     for(let x of game.PositiveCashFlows){
       if (x.when > OneMinuteAgo) break;
       game.LifeTimeRevenueMinus1Minute += x.amount;
-      
+
       toRemove.push(x);
     }
     game.PositiveCashFlows = game.PositiveCashFlows.filter(item => !toRemove.includes(item))
@@ -2112,7 +2173,7 @@ function trackIncome() {
     for(let x of game.PositivePointEvents){
       if (x.when > OneMinuteAgo) break;
       game.LifeTimePointsMinus1Minute += x.amount;
-      
+
       toRemove.push(x);
     }
     game.PositivePointEvents = game.PositivePointEvents.filter(item => !toRemove.includes(item))
@@ -2143,7 +2204,7 @@ function loadmenu():void {
 
 function exitloadmenu():void {
   $id('loadscreen').classList.add('hidden');
-  $id('startscreen').classList.remove('hidden');  
+  $id('startscreen').classList.remove('hidden');
 }
 
 function drawLoadScreen():void {
@@ -2163,8 +2224,46 @@ function exitabout() {
   $id('aboutscreen').classList.add('hidden');
   $id('startscreen').classList.remove('hidden');
 }
-  
+
 
 function joinemail() {
   //todo: join mailing list function joinemail
 }
+
+class Cordova{
+  static Attach() {
+    document.addEventListener("deviceready", () => {
+      const cordova = new Cordova();
+      cordova.init();
+
+      window.app = cordova;
+      log('Cordova Attached');
+      cordova.onResume();
+
+      // Initialize
+      Game.init();
+
+    }, false);
+  }
+
+  onPause() {
+    log('Saving')
+  }
+
+  onResume() {
+    log('Restoring from save')
+  }
+
+  init() {
+    document.addEventListener("pause", () => this.onPause(), false);
+    document.addEventListener("resume", () => this.onResume(), false);
+  }
+}
+
+// if using cordova vs if in browser
+if (window.usingCordova) {
+  Cordova.Attach();
+} else {
+  Game.init();
+}
+

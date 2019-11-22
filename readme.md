@@ -13,7 +13,7 @@ It's a kind of 'lemonade stand' game, but instead of buying lemons 🍋 and maki
 Play it online here:
 
 <https://secretgeek.github.io/devShop/>
-
+ 
 
 ## Walkthrough
 

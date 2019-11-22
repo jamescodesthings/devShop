@@ -56,19 +56,9 @@ var timeBarFeatureFlag = false;
 var timePenaltyFeatureFlag = false;
 var debugOutput = false;
 var game;
-// basic test modes
-testMode = (testMode || getParameterByName('testmode') == "true");
-var avgDuration = testMode ? 4 : 600; // factor that all work durations are based on, in milliseconds
-var startingMoney = testMode ? 100 : 100;
-var defaultCompletionTime = testMode ? 10 : 100; //how long have you got to complete a project, in seconds?
-debugOutput = (debugOutput || testMode || getParameterByName('debug') == "true");
-// basic feature flags
-timeBarFeatureFlag = (timeBarFeatureFlag || getParameterByName('timebarflag') == "true"); //?timebarflag=true
-storeFeatureFlag = (storeFeatureFlag || getParameterByName('storeflag') == "true"); //?storeflag=true
-if (debugOutput) {
-    $id('debug').classList.remove('hidden');
-    log('debug mode detected');
-}
+var avgDuration;
+var startingMoney;
+var defaultCompletionTime;
 var ItemCode;
 (function (ItemCode) {
     ItemCode[ItemCode["cat"] = 1] = "cat";
@@ -227,6 +217,50 @@ var Game = /** @class */ (function () {
         this.PositiveCashFlows = [];
         this.PositivePointEvents = [];
     }
+    Game.init = function () {
+        log('Initialising variables');
+        // basic test modes
+        testMode = (testMode || getParameterByName('testmode') == "true");
+        avgDuration = testMode ? 4 : 600; // factor that all work durations are based on, in milliseconds
+        startingMoney = testMode ? 100 : 100;
+        defaultCompletionTime = testMode ? 10 : 100; //how long have you got to complete a project, in seconds?
+        debugOutput = (debugOutput || testMode || getParameterByName('debug') == "true");
+        // basic feature flags
+        timeBarFeatureFlag = (timeBarFeatureFlag || getParameterByName('timebarflag') == "true"); //?timebarflag=true
+        storeFeatureFlag = (storeFeatureFlag || getParameterByName('storeflag') == "true"); //?storeflag=true
+        if (debugOutput) {
+            $id('debug').classList.remove('hidden');
+            log('debug mode detected');
+        }
+        else {
+            $id('debug').classList.add('hidden');
+        }
+        Game.updateAbout();
+    };
+    Game.reload = function () {
+        window.location.reload();
+    };
+    Game.toggleDebug = function () {
+        Game.toggle('debug');
+    };
+    Game.toggleTest = function () {
+        Game.toggle('testmode');
+    };
+    Game.toggle = function (param) {
+        log('toggling ${param}');
+        // Force a reload
+        $('exitAbout').classList.add('hidden');
+        var current = getParameterByName(param) === 'true';
+        setParameterByName(param, current ? 'false' : 'true');
+        log("setting " + param + " to " + !current);
+        Game.init();
+    };
+    Game.updateAbout = function () {
+        $id('toggleDebug')
+            .innerHTML = "\uD83D\uDC1E Toggle Debug: " + getParameterByName('debug');
+        $id('toggleTest')
+            .innerHTML = "\uD83D\uDCDD Toggle Test: " + getParameterByName('testmode');
+    };
     return Game;
 }());
 var Project = /** @class */ (function () {
@@ -645,7 +679,7 @@ function isPossible(story) {
     if (game.SelectedDoer != undefined && game.SelectedDoer != null) {
         if (story.skillneeded == "any")
             return true;
-        console.log("skillneeded", story.skillneeded);
+        console.log("skillneeded " + story.skillneeded);
         var skills = game.People[game.SelectedDoer].skills;
         console.log(skills);
         if (Object.keys(skills).includes(story.skillneeded)) {
@@ -1468,6 +1502,11 @@ function removeAllClass(className) {
     }
 }
 function getParameterByName(name) {
+    if (window.usingCordova) {
+        var val = localStorage.getItem(name);
+        // if (val) log(`got ${name}: ${val}`);
+        return val;
+    }
     var url = window.location.href;
     name = name.replace(/[\[\]]/g, '\\$&');
     var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'), results = regex.exec(url);
@@ -1476,6 +1515,16 @@ function getParameterByName(name) {
     if (!results[2])
         return '';
     return decodeURIComponent(results[2].replace(/\+/g, ' '));
+}
+function setParameterByName(name, value) {
+    log("setting " + name + ": " + value);
+    if (window.usingCordova) {
+        localStorage.setItem(name, value);
+        log("set in local storage " + name + ": " + value);
+    }
+    else {
+        log('Can\'t set yet...todo');
+    }
 }
 function drawMessage(message) {
     log('m:' + message);
@@ -1765,4 +1814,38 @@ function exitabout() {
 }
 function joinemail() {
     //todo: join mailing list function joinemail
+}
+var Cordova = /** @class */ (function () {
+    function Cordova() {
+    }
+    Cordova.Attach = function () {
+        document.addEventListener("deviceready", function () {
+            var cordova = new Cordova();
+            cordova.init();
+            window.app = cordova;
+            log('Cordova Attached');
+            cordova.onResume();
+            // Initialize
+            Game.init();
+        }, false);
+    };
+    Cordova.prototype.onPause = function () {
+        log('Saving');
+    };
+    Cordova.prototype.onResume = function () {
+        log('Restoring from save');
+    };
+    Cordova.prototype.init = function () {
+        var _this = this;
+        document.addEventListener("pause", function () { return _this.onPause(); }, false);
+        document.addEventListener("resume", function () { return _this.onResume(); }, false);
+    };
+    return Cordova;
+}());
+// if using cordova vs if in browser
+if (window.usingCordova) {
+    Cordova.Attach();
+}
+else {
+    Game.init();
 }

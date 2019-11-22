@@ -40,7 +40,20 @@
 
     <p>This about screen will say something about DevShop soon.</p>
     <p>Oh, try <a href='https://NimbleText.com/live/' target='_blank'>NimbleText</a> I guess.</p>
-    <div class='button' id='exitload' onclick='exitabout();' tabindex='0' role='button'>🏠 exit about</div>
+    <div class='button' id='exitAbout' onclick='exitabout();' tabindex='0' role='button'>
+      🏠 Go Home
+    </div>
+    <div class='button' id='toggleDebug' onclick='Game.toggleDebug();' tabindex='1' role='button'>
+      🐞 Toggle Debug
+    </div>
+    <div class='button' id='toggleTest' onclick='Game.toggleTest();' tabindex='1' role='button'>
+      📝 Toggle Test
+    </div>
+    <div class='button' id='reloadPage' onclick='Game.reload();' tabindex='1' role='button'>
+      ♻️ Reload
+    </div>
+
+
 
 
   </div>
@@ -203,7 +216,10 @@
   <a id='helpLink' href='https://github.com/secretGeek/devShop#walkthrough' target='_blank'>help</a>
   <div id='debug' class='hidden' style='clear:both'></div>
 </div>
+<script>
+  window.usingCordova = false;
+</script>
+<script src='cordova.js' type="text/javascript" onload="javascript:window.usingCordova = true;"></script>
 <script src='script.js?3' type="text/javascript"></script>
-<script src='cordova.js' type="text/javascript"></script>
 </body>
 </html>
