@@ -361,7 +361,16 @@ class Game {
     Game.updateAbout();
   }
 
+  static reset() {
+    log('resetting save!');
+    localStorage.removeItem('game');
+
+    Game.reload();
+  }
+
   static reload() {
+    Game.save();
+
     window.location.reload();
   }
 
@@ -393,6 +402,7 @@ class Game {
   }
 
   static goHome() {
+    Game.save();
     Game.hideOffice();
   }
 
@@ -427,9 +437,31 @@ class Game {
     $id('startscreen').classList.remove('hidden');
     $id('office').classList.add('hidden');
     $id('getLead').classList.add('hidden');
+    $id('aboutLink').classList.remove('hidden');
+    $id('helpLink').classList.remove('hidden');
     removeClass(".getPerson", 'hidden'); //hide 'buy dev/test/ba' buttons. (They are re-enabled when total >= 300)
     addClass('.metrics','hidden'); // show heads up display.
     if (!timeBarFeatureFlag) $id('rate').classList.remove('hidden');
+  }
+
+  static save() {
+    localStorage.setItem('game', JSON.stringify(game));
+  }
+
+  static load() {
+    log(`Loading from localStorage`);
+    const saved = localStorage.getItem('game');
+    if(saved) {
+      try {
+        game = JSON.parse(saved);
+        drawRoom();
+        $id('continue').classList.remove('hidden');
+        $id('start').classList.add('hidden');
+        log('loaded');
+      } catch (e) {
+        log(`could not load ${e.message}`);
+      }
+    }
   }
 }
 
@@ -550,6 +582,7 @@ function drawRoom():void {
   drawPeople(game.People);
   drawStories(game.Stories);
   drawMoney(game.Money);
+  drawLevel();
   drawButtons();
 }
 
@@ -625,6 +658,10 @@ function drawTimebar(target: HTMLSpanElement, key: string, story: Story):void { 
   }
 }
 
+function isDone(story: Story): boolean {
+  return story.status === 'done'
+    || (story.status === 'story' && story.skillneeded === 'archived');
+}
 
 function drawStory(key: string, stories: { [x: string]: Story; }, top: boolean):void {
   const el = document.getElementById('kanbanboard');
@@ -632,6 +669,10 @@ function drawStory(key: string, stories: { [x: string]: Story; }, top: boolean):
   let avatar = "";
   let busy = "";
   let story = stories[key];
+
+  // Shortcut: Don't draw if done!
+  if (isDone(story)) return;
+
   if (story.icon != undefined) {
     avatar = "<span class='avatar'>" + story.icon + "</span>";
   }
@@ -1771,6 +1812,8 @@ function bankStory(storyId: string) {
     return;
   }
 
+  story.skillneeded = 'archived';
+
   let price = Math.floor(story.points * story.pointPrice);
   let message2 = ` for '${story.summary}'`;
   incrementXP(5);
@@ -1780,6 +1823,7 @@ function bankStory(storyId: string) {
     message2 += " (reduced as customer found that bug)";
   }
 
+  // todo: Don't think this works (duplicate project & stories bug)
   let projectId = game.Stories[storyId].projectId;
   //remove the story from the project it belongs to.
   let project = game.Projects[projectId];
@@ -1819,7 +1863,9 @@ function bankStory(storyId: string) {
         }
       }
 
+      //todo: don't think this is working?
       for(const s in project.stories){
+
         delete game.Stories[s];
       }
       delete game.Projects[projectId];
@@ -1977,10 +2023,12 @@ function LevelUp() {
       game.StoreItems[key].price = 5;
     }
   }
+}
 
+function drawLevel() {
   switch(game.Level) {
     case 2:
-    //show 'hire dev/tester/ba' buttons
+      //show 'hire dev/tester/ba' buttons
       removeClass('.getPerson.dev', 'hidden');
       addClass(".getPerson.dev", 'hint');
       if (storeFeatureFlag) {
@@ -1997,7 +2045,6 @@ function LevelUp() {
       addClass('.getPerson.ba', 'hint');
       break;
   }
-
 }
 
 
@@ -2263,15 +2310,17 @@ class Cordova{
 
   onPause() {
     log('Saving')
+    Game.save();
   }
 
   onResume() {
     log('Restoring from save')
+    Game.load();
   }
 
   init() {
     document.addEventListener("pause", () => this.onPause(), false);
-    document.addEventListener("resume", () => this.onResume(), false);
+    window.addEventListener("beforeunload", () => this.onPause());
   }
 }
 

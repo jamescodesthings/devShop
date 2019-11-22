@@ -237,7 +237,13 @@ var Game = /** @class */ (function () {
         }
         Game.updateAbout();
     };
+    Game.reset = function () {
+        log('resetting save!');
+        localStorage.removeItem('game');
+        Game.reload();
+    };
     Game.reload = function () {
+        Game.save();
         window.location.reload();
     };
     Game.toggleDebug = function () {
@@ -262,6 +268,7 @@ var Game = /** @class */ (function () {
             .innerHTML = "\uD83D\uDCDD Toggle Test: " + getParameterByName('testmode');
     };
     Game.goHome = function () {
+        Game.save();
         Game.hideOffice();
     };
     Game.start = function () {
@@ -291,10 +298,31 @@ var Game = /** @class */ (function () {
         $id('startscreen').classList.remove('hidden');
         $id('office').classList.add('hidden');
         $id('getLead').classList.add('hidden');
+        $id('aboutLink').classList.remove('hidden');
+        $id('helpLink').classList.remove('hidden');
         removeClass(".getPerson", 'hidden'); //hide 'buy dev/test/ba' buttons. (They are re-enabled when total >= 300)
         addClass('.metrics', 'hidden'); // show heads up display.
         if (!timeBarFeatureFlag)
             $id('rate').classList.remove('hidden');
+    };
+    Game.save = function () {
+        localStorage.setItem('game', JSON.stringify(game));
+    };
+    Game.load = function () {
+        log("Loading from localStorage");
+        var saved = localStorage.getItem('game');
+        if (saved) {
+            try {
+                game = JSON.parse(saved);
+                drawRoom();
+                $id('continue').classList.remove('hidden');
+                $id('start').classList.add('hidden');
+                log('loaded');
+            }
+            catch (e) {
+                log("could not load " + e.message);
+            }
+        }
     };
     return Game;
 }());
@@ -341,6 +369,7 @@ function drawRoom() {
     drawPeople(game.People);
     drawStories(game.Stories);
     drawMoney(game.Money);
+    drawLevel();
     drawButtons();
 }
 function drawButtons() {
@@ -406,12 +435,19 @@ function drawTimebar(target, key, story) {
         target.style.backgroundColor = bg;
     }
 }
+function isDone(story) {
+    return story.status === 'done'
+        || (story.status === 'story' && story.skillneeded === 'archived');
+}
 function drawStory(key, stories, top) {
     var el = document.getElementById('kanbanboard');
     var s = el.querySelector('#' + key);
     var avatar = "";
     var busy = "";
     var story = stories[key];
+    // Shortcut: Don't draw if done!
+    if (isDone(story))
+        return;
     if (story.icon != undefined) {
         avatar = "<span class='avatar'>" + story.icon + "</span>";
     }
@@ -1431,6 +1467,7 @@ function bankStory(storyId) {
         drawStory(storyId, game.Stories, true); //at the top.
         return;
     }
+    story.skillneeded = 'archived';
     var price = Math.floor(story.points * story.pointPrice);
     var message2 = " for '" + story.summary + "'";
     incrementXP(5);
@@ -1438,6 +1475,7 @@ function bankStory(storyId) {
         //(it was halved when it was first found)
         message2 += " (reduced as customer found that bug)";
     }
+    // todo: Don't think this works (duplicate project & stories bug)
     var projectId = game.Stories[storyId].projectId;
     //remove the story from the project it belongs to.
     var project = game.Projects[projectId];
@@ -1469,6 +1507,7 @@ function bankStory(storyId) {
                     incrementXP(5);
                 }
             }
+            //todo: don't think this is working?
             for (var s in project.stories) {
                 delete game.Stories[s];
             }
@@ -1608,6 +1647,8 @@ function LevelUp() {
             game.StoreItems[key].price = 5;
         }
     }
+}
+function drawLevel() {
     switch (game.Level) {
         case 2:
             //show 'hire dev/tester/ba' buttons
@@ -1848,14 +1889,16 @@ var Cordova = /** @class */ (function () {
     };
     Cordova.prototype.onPause = function () {
         log('Saving');
+        Game.save();
     };
     Cordova.prototype.onResume = function () {
         log('Restoring from save');
+        Game.load();
     };
     Cordova.prototype.init = function () {
         var _this = this;
         document.addEventListener("pause", function () { return _this.onPause(); }, false);
-        document.addEventListener("resume", function () { return _this.onResume(); }, false);
+        window.addEventListener("beforeunload", function () { return _this.onPause(); });
     };
     return Cordova;
 }());
