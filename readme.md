@@ -1,3 +1,9 @@
+# DevShop Cordova
+A fork of DevShop with a quick and dirty cordova wrapper.
+
+This fork contains style changes required for responsive use.
+The wrapper is available [here](https://github.com/jamescodesthings/devShop-cordova)
+
 # DevShop!
 
 I had this idea 10 years ago for a game called [DevShop](http://www.secretgeek.net/devshop_i) and decided to implement a minimal version of it, in vanilla js, with the *no-framework*.
