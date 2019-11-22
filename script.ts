@@ -374,9 +374,9 @@ class Game {
   }
 
   static toggle(param) {
-    log('toggling ${param}');
+    log(`toggling ${param}`);
     // Force a reload
-    $('exitAbout').classList.add('hidden');
+    $id('exitAbout').classList.add('hidden');
     const current = getParameterByName(param) === 'true';
 
     setParameterByName(param, current ? 'false' : 'true');
@@ -390,6 +390,46 @@ class Game {
       .innerHTML = `🐞 Toggle Debug: ${getParameterByName('debug')}`;
     $id('toggleTest')
       .innerHTML = `📝 Toggle Test: ${getParameterByName('testmode')}`;
+  }
+
+  static goHome() {
+    Game.hideOffice();
+  }
+
+  static start() {
+    initGameState();
+    drawRoom();
+
+    Game.showOffice();
+
+    drawMessage("STEP 1: press '🎁 find project'");
+    startMainLoop();
+  }
+
+  static continue() {
+    Game.showOffice();
+  }
+
+  static showOffice() {
+    $id('start').classList.add('hidden');
+    $id('continue').classList.remove('hidden');
+    $id('startscreen').classList.add('hidden');
+    $id('aboutLink').classList.add('hidden');
+    $id('helpLink').classList.add('hidden');
+    $id('office').classList.remove('hidden');
+    $id('getLead').classList.remove('hidden');
+    addClass(".getPerson", 'hidden'); //hide 'buy dev/test/ba' buttons. (They are re-enabled when total >= 300)
+    removeClass('.metrics','hidden'); // show heads up display.
+    if (!timeBarFeatureFlag) $id('rate').classList.add('hidden');
+  }
+
+  static hideOffice() {
+    $id('startscreen').classList.remove('hidden');
+    $id('office').classList.add('hidden');
+    $id('getLead').classList.add('hidden');
+    removeClass(".getPerson", 'hidden'); //hide 'buy dev/test/ba' buttons. (They are re-enabled when total >= 300)
+    addClass('.metrics','hidden'); // show heads up display.
+    if (!timeBarFeatureFlag) $id('rate').classList.remove('hidden');
   }
 }
 
@@ -773,31 +813,6 @@ function drawPeople(people: { [id: string] : Person; }):void {
   for(const key in people) {
      drawPerson(key, people);
   }
-}
-
-
-function go():void {
-
-  initGameState();
-  drawRoom();
-  $id('start').classList.remove("pulse");   //hide 'start' button's pulse effect.
-  $id('start').classList.add("hidden");   //hide 'start' button
-
-  //removeClass('#office', 'hidden');
-  $id('startscreen').classList.add('hidden');
-  $id('aboutLink').classList.add('hidden');
-  $id('helpLink').classList.add('hidden');
-  $id('office').classList.remove('hidden');
-  removeClass('#getLead', 'hidden'); //show 'purchase sales lead' button
-  removeClass('.metrics','hidden'); // show heads up display.
-  if (!timeBarFeatureFlag) $id('rate').classList.add('hidden');
-
-  addClass(".getPerson", 'hidden'); //hide 'buy dev/test/ba' buttons. (They are re-enabled when total >= 300)
-
-
-
-  drawMessage("STEP 1: press '🎁 find project'");
-  startMainLoop();
 }
 
 function getNewLead():void {

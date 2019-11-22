@@ -1,3 +1,4 @@
+@charset "UTF-8";
 *,
 *::before,
 *::after {
@@ -892,6 +893,61 @@ th {
   #xp, #level, #rate {
     margin-right: 4px;
   }
+}
+#startscreen h1 {
+  text-align: center;
+  font-size: 38pt;
+  margin: 30px auto;
+  transform: rotate(-12deg);
+  /*text-shadow:4px 4px var(--main-title-shadow);*/
+  text-shadow: 1px 1px var(--main-title-shadow1), 2px 2px var(--main-title-shadow2), 3px 3px var(--main-title-shadow3), 4px 4px var(--main-title-shadow4);
+}
+
+x#startscreen h1:after {
+  content: "🥓";
+  font-size: 0.5em;
+  text-transform: rotate(120deg);
+  margin-left: -12px;
+}
+
+#startscreen h2 {
+  text-align: center;
+  xfont-size: 38pt;
+  margin: 30px auto;
+  xtransform: rotate(-12deg);
+  padding-bottom: 5px;
+  margin-bottom: 0;
+}
+
+#startscreen input[type=email] {
+  text-align: center;
+  margin: 0 auto;
+  border: 1px solid var(--main-border);
+  padding: 3pt;
+  display: block;
+  width: 200px;
+}
+
+#startscreen a {
+  text-align: center;
+  margin: 0 auto;
+  display: block;
+  font-size: small;
+  text-decoration: none;
+  width: 200px;
+}
+
+#startscreen .button {
+  display: flex;
+  margin: 20px auto;
+}
+
+#startscreen .hidden, #startscreen input[type=email].hidden {
+  display: none;
+}
+
+#startscreen .button#joinemail {
+  margin-top: 10px;
 }
 
 /*# sourceMappingURL=style.css.map */
