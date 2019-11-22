@@ -1,7 +1,7 @@
 // *******************************************************
 // ** Pull requests not actually welcome at this moment **
 // *******************************************************
-// as described in the readme, I may take this commercial, and haven't thought through the implications of accepting PRs on it prior to that. 
+// as described in the readme, I may take this commercial, and haven't thought through the implications of accepting PRs on it prior to that.
 // Ordinarily I'd *love* to welcome PR's but for now, no PR's please.
 //Definitely
 // [ ] select skill from inbox, a worker is highlighted. but when their initiative ticks over, they lose their highlight.
@@ -25,8 +25,8 @@
 // [ ] 🐛Words wrap in store
 // [ ] 🐛Icons and help icon are not vertically centered in store (other content is not either)
 // [ ] Training should have a time cost (? increases at higher levels of training)
-// [ ] Multi-skilled person choosing task to do could be based on: 
-//        total number of points in a column divided by number of people with that skill. 
+// [ ] Multi-skilled person choosing task to do could be based on:
+//        total number of points in a column divided by number of people with that skill.
 //        Worst ratio? Do that next. In case of tie-break, go with right most column.
 //        No -- if any are worse than the threshold -- do the worst.
 //        if all are better than the threshold, choose from the right.
@@ -49,7 +49,7 @@
 // -> game itself needs a way to exit then.
 // fire people?
 // limited people?
-// 
+//
 var testMode = false; //true;
 var storeFeatureFlag = true; //testMode;
 var timeBarFeatureFlag = false;
@@ -62,7 +62,7 @@ var avgDuration = testMode ? 4 : 600; // factor that all work durations are base
 var startingMoney = testMode ? 100 : 100;
 var defaultCompletionTime = testMode ? 10 : 100; //how long have you got to complete a project, in seconds?
 debugOutput = (debugOutput || testMode || getParameterByName('debug') == "true");
-// basic feature flags  
+// basic feature flags
 timeBarFeatureFlag = (timeBarFeatureFlag || getParameterByName('timebarflag') == "true"); //?timebarflag=true
 storeFeatureFlag = (storeFeatureFlag || getParameterByName('storeflag') == "true"); //?storeflag=true
 if (debugOutput) {
@@ -183,7 +183,7 @@ function getAllPeopleTypes() {
 // *******************************************************
 // ** Pull requests not actually welcome at this moment **
 // *******************************************************
-// as described in the readme (and above), I may take this commercial, and haven't thought through the implications of accepting PRs on it prior to that. 
+// as described in the readme (and above), I may take this commercial, and haven't thought through the implications of accepting PRs on it prior to that.
 // Ordinarily I'd *love* to welcome PR's but for now, no PR's please.
 var Game = /** @class */ (function () {
     function Game(startingMoney) {
@@ -408,7 +408,7 @@ function updateColumnCount(column) {
         var count = $('#' + column + ' .inner .story').length;
         target[0].innerText = '' + count;
         target[0].setAttribute('data-count', '' + count);
-        // consider: check the number of people who have this skill. 
+        // consider: check the number of people who have this skill.
         //If the count > (#people) make the color yellowish;
         //if the count > (#people * 2 + 2) make the color redish;
     }
@@ -516,10 +516,12 @@ function drawPeople(people) {
 function go() {
     initGameState();
     drawRoom();
-    $id('start').classList.remove("pulse"); //hide 'start' button's pulse effect. 
+    $id('start').classList.remove("pulse"); //hide 'start' button's pulse effect.
     $id('start').classList.add("hidden"); //hide 'start' button
     //removeClass('#office', 'hidden');
     $id('startscreen').classList.add('hidden');
+    $id('aboutLink').classList.add('hidden');
+    $id('helpLink').classList.add('hidden');
     $id('office').classList.remove('hidden');
     removeClass('#getLead', 'hidden'); //show 'purchase sales lead' button
     removeClass('.metrics', 'hidden'); // show heads up display.
@@ -874,8 +876,8 @@ function applyItem(person, item) {
             log("Unhandled item type! " + item.icon + " " + item.code + " " + item.name);
     }
 }
-// Some items (like the dog and the cat) have a short initially 'busy' phase after you grab them. 
-// Once that finishes, 
+// Some items (like the dog and the cat) have a short initially 'busy' phase after you grab them.
+// Once that finishes,
 function usingFinishedBusyPhase(person, item) {
     person.busy = false;
     person.summary = "💤";
@@ -938,7 +940,7 @@ function selfStart(person, triggerTime) {
     log(person.name + " " + person.icon + " is busy? " + person.busy);
     if (!person.busy) {
         log(person.name + " " + person.icon + " is checking the board now....");
-        //TODO: implement this. And log above instead of 'drawmessage'  
+        //TODO: implement this. And log above instead of 'drawmessage'
         var columns = [];
         // we prioritise self-starting from the back of the board.
         if (person.skills["test"] && person.skills["test"].level > 0) {
@@ -1091,8 +1093,8 @@ function getSummary(story) {
 function getTaskVerb(skill) {
     switch (skill) {
         case "ba": return "analyzing"; //scribing, breaking-down, encarding
-        case "dev": return "designing"; //envisioning, grasping, comprehending, studying, 
-        case "dev0": return "developing"; //"hacking", "coding", "developing", 
+        case "dev": return "designing"; //envisioning, grasping, comprehending, studying,
+        case "dev0": return "developing"; //"hacking", "coding", "developing",
         case "test": return "testing"; //inspecting
     }
 }
@@ -1151,7 +1153,7 @@ function doneBa(storyId) {
         oldStory.skillneeded = "dev"; //it goes into backlog, with bug fixed.
         oldStory.hasSpecBug = false; //if it was a spec bug, it is now fixed.
         oldStory.hasBug = false; //If it was a regular bug, the further development will resolve it.
-        oldStory.icon = null; //remove the icon... 
+        oldStory.icon = null; //remove the icon...
         log("Fixed the bug (or spec bug)");
         removeStory(storyId); //remove the story from the Inbox...
         drawStory(storyId, game.Stories, true); //top of the backlog... race it through
@@ -1624,7 +1626,7 @@ function drawStore() {
     var itemList = $id('items');
     // clear store items from #items
     itemList.innerText = "";
-    // add store items to #items  
+    // add store items to #items
     for (var _i = 0, _a = Object.keys(game.StoreItems); _i < _a.length; _i++) {
         var key = _a[_i];
         var item = game.StoreItems[key];
@@ -1667,7 +1669,7 @@ function purchase(itemId) {
     game.Items["i" + clone.id] = clone;
     drawStoreMessage("You bought " + clone.name + " " + clone.icon + " for \uD83D\uDCB2" + clone.price + ". Nice!");
     // Every time you purchase an item, the price of that item goes up
-    // consider: some specific items should have a different inflation curve. 
+    // consider: some specific items should have a different inflation curve.
     item.price = Inflate(game.MediumInflation, item.price);
     drawInboxItem("i" + clone.id, clone);
     $id("store-button-" + itemId).innerText = "\uD83D\uDCB2" + item.price;
@@ -1705,7 +1707,7 @@ function trackIncome() {
     if (gameAge_s > 60) {
         var OneMinuteAgo = new Date(now.getTime() - 60000);
         var toRemove_1 = [];
-        //remove any incomes from start of 
+        //remove any incomes from start of
         for (var _i = 0, _a = game.PositiveCashFlows; _i < _a.length; _i++) {
             var x = _a[_i];
             if (x.when > OneMinuteAgo)
